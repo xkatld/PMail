@@ -156,7 +156,7 @@ func doSend(ctx *context.Context, fromDomain string, data []byte, to []*parsemai
 					log.WithContext(ctx).Infof("Send By Port %s Success", port)
 					return
 				}
-				log.WithContext(ctx).Debugf("SMTP on %s Send Error. %s", port, err.Error())
+				log.WithContext(ctx).Infof("SMTP on %s Send Error. %s", port, err.Error())
 			}
 
 			// 最后尝试非安全方式投递
