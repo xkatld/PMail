@@ -44,6 +44,7 @@ func Init(serverVersion string) {
 		go smtp_server.Start()
 		go smtp_server.StartWithTLS()
 		go smtp_server.StartWithTLSNew()
+		go smtp_server.StartExtraPorts()
 		// http server start
 		go http_server.HttpsStart()
 		go http_server.HttpStart()

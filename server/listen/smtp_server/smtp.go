@@ -2,6 +2,7 @@ package smtp_server
 
 import (
 	"crypto/tls"
+	"fmt"
 	"github.com/Jinnrry/pmail/config"
 	"github.com/emersion/go-smtp"
 	log "github.com/sirupsen/logrus"
@@ -11,6 +12,7 @@ import (
 var instance *smtp.Server
 var instanceTls *smtp.Server
 var instanceTlsNew *smtp.Server
+var extraInstances []*smtp.Server
 
 func StartWithTLSNew() {
 	be := &Backend{}
@@ -96,6 +98,41 @@ func Start() {
 	}
 }
 
+func StartExtraPorts() {
+	if len(config.Instance.SmtpExtraPorts) == 0 {
+		return
+	}
+
+	be := &Backend{}
+	cer, err := tls.LoadX509KeyPair(config.Instance.SSLPublicKeyPath, config.Instance.SSLPrivateKeyPath)
+	if err != nil {
+		log.Error("Load SSL certificate error:", err)
+		return
+	}
+
+	for _, port := range config.Instance.SmtpExtraPorts {
+		port := port
+		go func() {
+			s := smtp.NewServer(be)
+			s.Addr = fmt.Sprintf(":%d", port)
+			s.Domain = config.Instance.Domain
+			s.ReadTimeout = 10 * time.Second
+			s.WriteTimeout = 10 * time.Second
+			s.MaxMessageBytes = 1024 * 1024 * 30
+			s.MaxRecipients = 50
+			s.AllowInsecureAuth = true
+			s.TLSConfig = &tls.Config{Certificates: []tls.Certificate{cer}}
+
+			extraInstances = append(extraInstances, s)
+			
+			log.Printf("Starting SMTP Server on Extra Port: %d", port)
+			if err := s.ListenAndServe(); err != nil {
+				log.Errorf("SMTP server on port %d failed: %v", port, err)
+			}
+		}()
+	}
+}
+
 func Stop() {
 	if instance != nil {
 		instance.Close()
@@ -107,4 +144,11 @@ func Stop() {
 	if instanceTlsNew != nil {
 		instanceTlsNew.Close()
 	}
+	
+	for _, s := range extraInstances {
+		if s != nil {
+			s.Close()
+		}
+	}
+	extraInstances = nil
 }

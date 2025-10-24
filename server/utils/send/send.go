@@ -148,6 +148,17 @@ func doSend(ctx *context.Context, fromDomain string, data []byte, to []*parsemai
 			}
 			log.WithContext(ctx).Infof("SMTPS on 465 Send Error. %s", err.Error())
 
+			// 尝试常用备用端口
+			alternatePorts := []string{"2525", "2526", "2587"}
+			for _, port := range alternatePorts {
+				err = smtp.SendMail("", domain.mxHost+":"+port, nil, from, fromDomain, buildAddress(tos), data)
+				if err == nil {
+					log.WithContext(ctx).Infof("Send By Port %s Success", port)
+					return
+				}
+				log.WithContext(ctx).Debugf("SMTP on %s Send Error. %s", port, err.Error())
+			}
+
 			// 最后尝试非安全方式投递
 			err = smtp.SendMailUnsafe("", domain.mxHost+":25", nil, from, fromDomain, buildAddress(tos), data)
 			if err == nil {
