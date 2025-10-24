@@ -44,7 +44,7 @@
           {{ lang.move_btn }}
           <span class="iconify ml-1" data-icon="mdi:chevron-down"></span>
         </button>
-        <div v-if="showMoveDropdown" class="absolute left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-10 min-w-[180px]">
+        <div v-if="showMoveDropdown" class="absolute left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 min-w-[180px]">
           <button 
             v-for="group in groupList" 
             :key="group.id"

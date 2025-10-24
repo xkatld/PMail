@@ -319,9 +319,22 @@ const showToast = (message, type = 'success') => {
 }
 
 const loadUsers = () => {
-  http.post("/api/user/list").then(res => {
+  http.post("/api/user/list", {
+    current_page: 1,
+    page_size: 1000
+  }).then(res => {
     if (res.errorNo === 0) {
-      users.value = res.data
+      // 后端返回的数据结构是 { list: [], current_page: 1, total_page: 1 }
+      const userList = res.data.list || []
+      // 映射数据字段
+      users.value = userList.map(user => ({
+        id: user.id,
+        username: user.name || user.account,
+        email: user.account,
+        isAdmin: user.is_admin === 1,
+        active: user.disabled === 0,
+        createdAt: user.created_at || '-'
+      }))
     }
   })
 }
@@ -345,8 +358,8 @@ const editUser = (user) => {
     username: user.username,
     email: user.email,
     password: '',
-    isAdmin: user.isAdmin,
-    active: user.active
+    isAdmin: user.isAdmin || false,
+    active: user.active !== false  // 确保是布尔值
   })
   showEditDialog.value = true
 }
@@ -357,12 +370,15 @@ const deleteUser = (user) => {
 }
 
 const confirmDelete = () => {
-  http.post("/api/user/delete", { id: currentUser.value.id }).then(res => {
+  http.post("/api/user/edit", { 
+    id: currentUser.value.id,
+    disabled: 1  // 禁用用户（后端没有真正的删除接口）
+  }).then(res => {
     if (res.errorNo === 0) {
-      showToast('用户删除成功', 'success')
+      showToast('用户已禁用', 'success')
       loadUsers()
     } else {
-      showToast(res.errorMsg || '用户删除失败', 'error')
+      showToast(res.errorMsg || '操作失败', 'error')
     }
   })
   showDeleteDialog.value = false
@@ -370,9 +386,12 @@ const confirmDelete = () => {
 }
 
 const toggleUserStatus = (user) => {
-  http.post("/api/user/toggle", { id: user.id, active: !user.active }).then(res => {
+  http.post("/api/user/edit", { 
+    id: user.id, 
+    disabled: user.active ? 1 : 0  // active为true表示启用，所以disabled应该为0；反之为1
+  }).then(res => {
     if (res.errorNo === 0) {
-      showToast(`用户已${!user.active ? '激活' : '禁用'}`, 'success')
+      showToast(`用户已${user.active ? '禁用' : '激活'}`, 'success')
       loadUsers()
     } else {
       showToast(res.errorMsg || '操作失败', 'error')
@@ -386,10 +405,26 @@ const saveUser = () => {
     return
   }
 
-  const endpoint = showAddDialog.value ? "/api/user/add" : "/api/user/update"
-  const data = showEditDialog.value 
-    ? { id: currentUser.value.id, ...userForm }
-    : userForm
+  const endpoint = showAddDialog.value ? "/api/user/create" : "/api/user/edit"
+  
+  // 构建请求数据，匹配后端接口
+  const data = {
+    account: userForm.email,  // 后端用 account 字段
+    username: userForm.username,
+    disabled: userForm.active ? 0 : 1  // active为true表示启用(disabled=0)
+  }
+  
+  // 只有添加用户时才需要密码
+  if (showAddDialog.value) {
+    data.password = userForm.password
+  } else if (userForm.password) {
+    // 编辑时如果填写了密码才更新
+    data.password = userForm.password
+  }
+  
+  if (showEditDialog.value) {
+    data.id = currentUser.value.id
+  }
 
   http.post(endpoint, data).then(res => {
     if (res.errorNo === 0) {
