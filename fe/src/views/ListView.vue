@@ -1,39 +1,55 @@
 <template>
-  <div class="h-full flex flex-col">
-    <!-- Operation Bar -->
-    <div class="h-10 bg-blue-50 flex items-center px-4">
-      <RouterLink to="/editer" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded text-decoration-none">
-        <span class="iconify mr-1" data-icon="mdi:plus"></span>{{ lang.compose }}
+  <div class="h-full flex flex-col bg-white">
+    <!-- 操作栏 -->
+    <div class="h-14 bg-gradient-to-r from-blue-50 to-white border-b flex items-center px-6">
+      <RouterLink 
+        to="/editer" 
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition duration-200 inline-flex items-center shadow-sm hover:shadow-md no-underline"
+      >
+        <span class="iconify mr-2 text-lg" data-icon="mdi:plus"></span>
+        {{ lang.compose }}
       </RouterLink>
     </div>
 
-    <!-- Title -->
-    <div class="text-2xl font-bold text-left px-5 py-3">{{ groupStore.name }}</div>
+    <!-- 标题 -->
+    <div class="px-6 py-4 border-b bg-white">
+      <h1 class="text-2xl font-bold text-gray-900 text-left">{{ groupStore.name }}</h1>
+    </div>
 
-    <!-- Action Buttons -->
-    <div class="flex items-center gap-3 px-5 pb-3">
-      <button @click="del" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm transition">
-        <span class="iconify mr-1" data-icon="mdi:delete"></span>{{ lang.del_btn }}
+    <!-- 操作按钮组 -->
+    <div class="flex items-center gap-3 px-6 py-4 bg-gray-50 border-b">
+      <button 
+        @click="del" 
+        class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition duration-200 inline-flex items-center"
+      >
+        <span class="iconify mr-1.5" data-icon="mdi:delete"></span>
+        {{ lang.del_btn }}
       </button>
-      <button @click="markRead" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm transition">
-        <span class="iconify mr-1" data-icon="mdi:email-open"></span>{{ lang.read_btn }}
+      
+      <button 
+        @click="markRead" 
+        class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition duration-200 inline-flex items-center"
+      >
+        <span class="iconify mr-1.5" data-icon="mdi:email-open"></span>
+        {{ lang.read_btn }}
       </button>
       
       <!-- Move Dropdown -->
       <div class="relative">
         <button 
           @click="showMoveDropdown = !showMoveDropdown" 
-          class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm transition flex items-center"
+          class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition duration-200 inline-flex items-center"
         >
+          <span class="iconify mr-1.5" data-icon="mdi:folder-move"></span>
           {{ lang.move_btn }}
           <span class="iconify ml-1" data-icon="mdi:chevron-down"></span>
         </button>
-        <div v-if="showMoveDropdown" class="absolute left-0 mt-1 bg-white border rounded shadow-lg z-10 min-w-[150px]">
+        <div v-if="showMoveDropdown" class="absolute left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-10 min-w-[180px]">
           <button 
             v-for="group in groupList" 
             :key="group.id"
             @click="move(group.id, group.name); showMoveDropdown = false"
-            class="block w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+            class="block w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition first:rounded-t-lg last:rounded-b-lg"
           >
             {{ group.name }}
           </button>
@@ -41,24 +57,24 @@
       </div>
     </div>
 
-    <!-- Email Table -->
-    <div class="flex-1 overflow-auto px-5">
+    <!-- 邮件列表 -->
+    <div class="flex-1 overflow-auto">
       <table class="w-full border-collapse">
-        <thead class="bg-gray-50 sticky top-0">
-          <tr class="border-b">
-            <th class="w-8 p-2">
+        <thead class="sticky top-0 bg-gray-100 z-10">
+          <tr>
+            <th class="border-b border-gray-200 p-3 text-left w-10">
               <input 
                 type="checkbox" 
                 @change="toggleSelectAll"
                 :checked="allSelected"
-                class="cursor-pointer"
+                class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
             </th>
-            <th class="w-12 p-2"></th>
-            <th class="w-36 p-2 text-left">{{ lang.sender }}</th>
-            <th class="w-36 p-2 text-left">{{ lang.to }}</th>
-            <th class="p-2 text-left">{{ lang.title }}</th>
-            <th class="w-44 p-2 text-left">{{ lang.date }}</th>
+            <th class="border-b border-gray-200 p-3 text-left w-12"></th>
+            <th class="border-b border-gray-200 p-3 text-left w-48 font-semibold text-sm text-gray-700">{{ lang.sender }}</th>
+            <th class="border-b border-gray-200 p-3 text-left w-48 font-semibold text-sm text-gray-700">{{ lang.to }}</th>
+            <th class="border-b border-gray-200 p-3 text-left font-semibold text-sm text-gray-700">{{ lang.title }}</th>
+            <th class="border-b border-gray-200 p-3 text-left w-44 font-semibold text-sm text-gray-700">{{ lang.date }}</th>
           </tr>
         </thead>
         <tbody>
@@ -66,59 +82,59 @@
             v-for="row in data" 
             :key="row.id"
             @click="rowClick(row)"
-            class="border-b hover:bg-gray-50 cursor-pointer transition"
+            class="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition duration-150"
           >
-            <td class="p-2">
+            <td class="p-3">
               <input 
                 type="checkbox" 
                 v-model="row.selected"
                 @click.stop
-                class="cursor-pointer"
+                class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
             </td>
-            <td class="p-2">
-              <div class="flex items-center gap-1">
-                <span v-if="!row.is_read" class="text-blue-500 font-bold text-xs">{{ lang.new }}</span>
-                <span v-if="row.dangerous" class="text-red-600 font-bold" :title="lang.dangerous">!</span>
-                <span v-if="row.error !== ''" class="text-red-600 font-bold" :title="row.error">!</span>
+            <td class="p-3">
+              <div class="flex items-center gap-1.5">
+                <span v-if="!row.is_read" class="inline-flex items-center px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded">{{ lang.new }}</span>
+                <span v-if="row.dangerous" class="text-red-600 font-bold text-lg" :title="lang.dangerous">!</span>
+                <span v-if="row.error !== ''" class="text-red-600 font-bold text-lg" :title="row.error">!</span>
               </div>
             </td>
-            <td class="p-2">
+            <td class="p-3">
               <span 
                 :title="row.sender.EmailAddress"
-                class="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded"
+                class="inline-block px-2.5 py-1 bg-gray-100 text-gray-700 text-xs rounded-md font-medium"
               >
                 {{ row.sender.Name !== '' ? row.sender.Name : row.sender.EmailAddress }}
               </span>
             </td>
-            <td class="p-2">
+            <td class="p-3">
               <span 
                 v-for="toInfo in row.to" 
                 :key="toInfo.EmailAddress"
                 :title="toInfo.EmailAddress"
-                class="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded mr-1"
+                class="inline-block px-2.5 py-1 bg-gray-100 text-gray-700 text-xs rounded-md font-medium mr-1"
               >
                 {{ toInfo.Name !== '' ? toInfo.Name : toInfo.EmailAddress }}
               </span>
             </td>
-            <td class="p-2">
-              <div :class="row.is_read ? '' : 'font-bold'">{{ row.title }}</div>
-              <div class="text-xs text-gray-500 h-6 overflow-hidden">{{ row.desc }}</div>
+            <td class="p-3">
+              <div :class="['text-sm', row.is_read ? 'text-gray-700' : 'font-semibold text-gray-900']">{{ row.title }}</div>
+              <div class="text-xs text-gray-500 h-5 overflow-hidden mt-0.5">{{ row.desc }}</div>
             </td>
-            <td class="p-2">
-              <span :class="row.is_read ? '' : 'font-bold'">{{ row.datetime }}</span>
+            <td class="p-3">
+              <span :class="['text-sm', row.is_read ? 'text-gray-600' : 'font-semibold text-gray-900']">{{ row.datetime }}</span>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Pagination -->
-    <div class="flex justify-center items-center gap-2 py-4">
+    <!-- 分页 -->
+    <div class="flex justify-center items-center gap-2 py-4 bg-white border-t">
       <button 
         @click="pageChange(currentPage - 1)" 
         :disabled="currentPage === 1"
-        class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+        class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 inline-flex items-center"
       >
         <span class="iconify" data-icon="mdi:chevron-left"></span>
       </button>
@@ -128,8 +144,8 @@
         :key="page"
         @click="pageChange(page)"
         :class="[
-          'px-3 py-1 rounded',
-          page === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+          'px-4 py-2 rounded-lg font-medium text-sm transition duration-200',
+          page === currentPage ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
         ]"
       >
         {{ page }}
@@ -138,23 +154,29 @@
       <button 
         @click="pageChange(currentPage + 1)" 
         :disabled="currentPage === totalPage"
-        class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+        class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 inline-flex items-center"
       >
         <span class="iconify" data-icon="mdi:chevron-right"></span>
       </button>
     </div>
 
     <!-- Confirm Dialog -->
-    <div v-if="showConfirm" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div v-if="showConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black bg-opacity-50" @click="showConfirm = false"></div>
-      <div class="relative bg-white rounded-lg p-6 w-96">
-        <h3 class="text-lg font-bold mb-4">{{ confirmTitle }}</h3>
-        <p class="mb-6">{{ confirmMessage }}</p>
+      <div class="relative bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+        <h3 class="text-lg font-bold text-gray-900 mb-2">{{ confirmTitle }}</h3>
+        <p class="text-gray-600 mb-6">{{ confirmMessage }}</p>
         <div class="flex justify-end gap-3">
-          <button @click="showConfirm = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">
+          <button 
+            @click="showConfirm = false" 
+            class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2.5 rounded-lg font-medium transition duration-200"
+          >
             Cancel
           </button>
-          <button @click="confirmAction" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
+          <button 
+            @click="confirmAction" 
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition duration-200"
+          >
             OK
           </button>
         </div>
@@ -162,13 +184,16 @@
     </div>
 
     <!-- Alert Dialog -->
-    <div v-if="alertMessage" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div v-if="alertMessage" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black bg-opacity-50" @click="alertMessage = ''"></div>
-      <div class="relative bg-white rounded-lg p-6 w-96">
-        <h3 class="text-lg font-bold mb-4">Notice</h3>
-        <p class="mb-6">{{ alertMessage }}</p>
+      <div class="relative bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Notice</h3>
+        <p class="text-gray-600 mb-6">{{ alertMessage }}</p>
         <div class="flex justify-end">
-          <button @click="alertMessage = ''" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
+          <button 
+            @click="alertMessage = ''" 
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition duration-200"
+          >
             OK
           </button>
         </div>
@@ -176,12 +201,13 @@
     </div>
 
     <!-- Toast Message -->
-    <div v-if="toastMessage" class="fixed top-4 right-4 z-50">
+    <div v-if="toastMessage" class="fixed top-6 right-6 z-50 animate-fade-in">
       <div :class="[
-        'px-6 py-3 rounded shadow-lg',
-        toastType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        'px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3',
+        toastType === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
       ]">
-        {{ toastMessage }}
+        <span class="iconify text-xl" :data-icon="toastType === 'success' ? 'mdi:check-circle' : 'mdi:alert-circle'"></span>
+        <span class="font-medium">{{ toastMessage }}</span>
       </div>
     </div>
   </div>
@@ -373,4 +399,18 @@ const pageChange = function (p) {
 </script>
 
 <style scoped>
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
 </style>

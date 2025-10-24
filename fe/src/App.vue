@@ -7,51 +7,27 @@ import {ref, watch} from 'vue'
 const route = useRoute()
 const pageName = ref(route.name)
 
-
-
-
 watch(
     () => route.fullPath,
     () => {
       pageName.value = route.name
     }
 )
-
 </script>
 
 <template>
-  <div id="main">
+  <div class="h-full flex flex-col">
     <HomeHeader/>
-    <div id="content">
-      <div id="aside" v-if="pageName !== 'login' && pageName !== 'setup'">
+    <div class="flex flex-1 overflow-hidden">
+      <div v-if="pageName !== 'login' && pageName !== 'setup'" class="bg-gray-50">
         <HomeAside/>
       </div>
-      <div id="body">
+      <div class="flex-1 overflow-auto">
         <RouterView/>
       </div>
     </div>
   </div>
 </template>
 
-
 <style scoped>
-#aside {
-  background-color: #F1F1F1;
-}
-
-#body {
-  width: 100%;
-  height: 100%;
-}
-
-#content {
-  display: flex;
-  height: 100%;
-}
-
-#main {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
 </style>
