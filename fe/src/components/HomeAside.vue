@@ -1,11 +1,41 @@
 <template>
-  <div id="main">
-    <input id="search" :placeholder="lang.search" />
-    <el-tree
-      :data="data"
-      :defaultExpandAll="true"
-      @node-click="handleNodeClick"
+  <div class="w-60 bg-gray-100 h-full">
+    <input 
+      id="search" 
+      :placeholder="lang.search" 
+      class="w-full h-10 px-3 bg-blue-100 border-none outline-none text-base"
     />
+    
+    <div class="overflow-y-auto">
+      <div v-for="item in data" :key="item.id" class="mb-2">
+        <!-- Parent Item -->
+        <div 
+          class="px-4 py-2 hover:bg-gray-200 cursor-pointer flex items-center justify-between"
+          @click="toggleExpand(item)"
+        >
+          <div class="flex items-center">
+            <span v-if="item.children && item.children.length > 0" class="mr-2">
+              <span class="iconify" :data-icon="item.expanded ? 'mdi:chevron-down' : 'mdi:chevron-right'"></span>
+            </span>
+            <span class="iconify mr-2" :data-icon="getIcon(item)"></span>
+            <span>{{ item.label }}</span>
+          </div>
+        </div>
+        
+        <!-- Children Items -->
+        <div v-if="item.expanded && item.children" class="ml-4">
+          <div 
+            v-for="child in item.children" 
+            :key="child.id"
+            class="px-4 py-2 hover:bg-gray-200 cursor-pointer flex items-center"
+            @click="handleNodeClick(child)"
+          >
+            <span class="iconify mr-2" :data-icon="getIcon(child)"></span>
+            <span>{{ child.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -21,8 +51,21 @@ const router = useRouter();
 const data = ref([]);
 
 http.get("/api/group").then((res) => {
-  if (res.data) data.value = res.data;
+  if (res.data) {
+    data.value = res.data.map(item => ({
+      ...item,
+      expanded: true
+    }));
+  }
 });
+
+const toggleExpand = (item) => {
+  if (item.children && item.children.length > 0) {
+    item.expanded = !item.expanded;
+  } else if (item.tag != null) {
+    handleNodeClick(item);
+  }
+};
 
 const handleNodeClick = function (data) {
   if (data.tag != null) {
@@ -33,32 +76,15 @@ const handleNodeClick = function (data) {
     });
   }
 };
+
+const getIcon = (item) => {
+  if (item.tag === 'inbox') return 'mdi:inbox';
+  if (item.tag === 'sent') return 'mdi:send';
+  if (item.tag === 'trash') return 'mdi:delete';
+  if (item.tag === 'spam') return 'mdi:alert-octagon';
+  return 'mdi:folder';
+};
 </script>
 
 <style scoped>
-#main {
-  width: 243px;
-  background-color: #f1f1f1;
-  height: 100%;
-}
-
-#search {
-  background-color: #d6e7f7;
-  width: 100%;
-  height: 40px;
-  padding-left: 10px;
-  border: none;
-  outline: none;
-  font-size: 16px;
-}
-
-.el-tree {
-  background-color: #f1f1f1;
-}
-
-.add_group {
-  font-size: 14px;
-  text-align: left;
-  padding-left: 15px;
-}
 </style>

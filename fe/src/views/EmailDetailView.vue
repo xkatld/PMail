@@ -1,62 +1,83 @@
 <template>
-  <div id="main">
-    <div id="title">{{ detailData.subject }}</div>
-    <el-divider/>
+  <div class="flex flex-col px-5 py-4 text-left">
+    <div class="text-4xl font-bold mb-4">{{ detailData.subject }}</div>
+    
+    <div class="border-t border-gray-300 my-4"></div>
 
-    <div>
-      <div>{{ lang.to }}：
-        <el-tooltip v-for="to in tos" :key.prop="to" class="box-item" effect="dark" :content="to.EmailAddress" placement="top">
-          <el-tag size="small" type="info">{{ to.Name !== '' ? to.Name : to.EmailAddress }}</el-tag>
-        </el-tooltip>
+    <div class="space-y-3 mb-4">
+      <div class="flex items-center">
+        <span class="font-semibold mr-2">{{ lang.to }}：</span>
+        <div class="flex flex-wrap gap-2">
+          <span 
+            v-for="to in tos" 
+            :key="to.EmailAddress"
+            :title="to.EmailAddress"
+            class="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-sm rounded"
+          >
+            {{ to.Name !== '' ? to.Name : to.EmailAddress }}
+          </span>
+        </div>
       </div>
 
-      <div v-if="showCC">{{ lang.cc }}：
-        <el-tooltip v-for="item in ccs" :key="item" class="box-item" effect="dark" :content="item.EmailAddress" placement="top">
-          <el-tag size="small" type="info">{{ item.Name !== '' ? item.Name : item.EmailAddress }}</el-tag>
-        </el-tooltip>
+      <div v-if="showCC" class="flex items-center">
+        <span class="font-semibold mr-2">{{ lang.cc }}：</span>
+        <div class="flex flex-wrap gap-2">
+          <span 
+            v-for="item in ccs" 
+            :key="item.EmailAddress"
+            :title="item.EmailAddress"
+            class="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-sm rounded"
+          >
+            {{ item.Name !== '' ? item.Name : item.EmailAddress }}
+          </span>
+        </div>
       </div>
 
-      <div>{{ lang.sender }}：
-        <el-tooltip class="box-item" effect="dark" :content="detailData.from_address" placement="top">
-          <el-tag size="small" type="info">
-            {{ detailData.from_name !== '' ? detailData.from_name : detailData.from_address }}
-          </el-tag>
-        </el-tooltip>
+      <div class="flex items-center">
+        <span class="font-semibold mr-2">{{ lang.sender }}：</span>
+        <span 
+          :title="detailData.from_address"
+          class="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-sm rounded"
+        >
+          {{ detailData.from_name !== '' ? detailData.from_name : detailData.from_address }}
+        </span>
       </div>
 
-      <div>{{ lang.date }}：
-        {{ detailData.send_date }}
+      <div>
+        <span class="font-semibold mr-2">{{ lang.date }}：</span>
+        <span>{{ detailData.send_date }}</span>
       </div>
     </div>
-    <el-divider/>
-    <div class="content" id="text" v-if="detailData.html === ''">
-      {{ detailData.text }}
+
+    <div class="border-t border-gray-300 my-4"></div>
+
+    <div class="content text-base leading-relaxed" v-if="detailData.html === ''">
+      <pre class="whitespace-pre-wrap font-sans">{{ detailData.text }}</pre>
     </div>
 
-    <div class="content" id="html" v-else v-html="detailData.html">
+    <div class="content" v-else v-html="detailData.html"></div>
 
+    <div v-if="detailData.attachments && detailData.attachments.length > 0" class="mt-6">
+      <div class="border-t border-gray-300 my-4"></div>
+      <div class="font-semibold mb-3">{{ lang.attachment }}：</div>
+      <div class="space-y-2">
+        <a 
+          v-for="item in detailData.attachments" 
+          :key="item.Index"
+          :href="'/attachments/download/' + detailData.id + '/' + item.Index"
+          class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded transition no-underline text-gray-800"
+        >
+          <span class="iconify text-xl" data-icon="mdi:file-document"></span>
+          <span>{{ item.Filename }}</span>
+        </a>
+      </div>
     </div>
-
-    <div v-if="detailData.attachments.length > 0" style="">
-      <el-divider/>
-      {{ lang.attachment }}：
-      <a class="att" v-for="item in detailData.attachments" :key="item"
-         :href="'/attachments/download/' + detailData.id + '/' + item.Index">
-        <el-icon>
-          <Document/>
-        </el-icon>
-        {{ item.Filename }} </a>
-    </div>
-
-
   </div>
 </template>
 
 <script setup>
-
 import {ref} from 'vue'
 import {useRoute} from 'vue-router'
-import {Document} from '@element-plus/icons-vue';
 import lang from '../i18n/i18n';
 import {http} from "@/utils/axios";
 
@@ -65,8 +86,8 @@ const detailData = ref({
   attachments: []
 })
 
-const tos = ref()
-const ccs = ref()
+const tos = ref([])
+const ccs = ref([])
 const showCC = ref(false)
 
 http.post("/api/email/detail", {id: parseInt(route.params.id)}).then(res => {
@@ -76,7 +97,6 @@ http.post("/api/email/detail", {id: parseInt(route.params.id)}).then(res => {
   }
   if (res.data.cc !== "" && res.data.cc != null) {
     ccs.value = JSON.parse(res.data.cc)
-
   }
 
   if (ccs.value != null) {
@@ -88,31 +108,8 @@ http.post("/api/email/detail", {id: parseInt(route.params.id)}).then(res => {
 </script>
 
 <style scoped>
-#main {
-  display: flex;
-  padding-left: 20px;
-  padding-right: 80px;
-  text-align: left;
-}
-
-#title {
-  font-size: 40px;
-  text-align: left;
-}
-
-#userItem {
-}
-
-.content {
-  /* background-color: aliceblue; */
-}
-
 a, a:link, a:visited, a:hover, a:active {
   text-decoration: none;
   color: inherit;
-}
-
-.att {
-  display: block;
 }
 </style>

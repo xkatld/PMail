@@ -1,45 +1,76 @@
 <template>
-  <div id="header_main">
-    <div id="logo">
-      <router-link to="/" style="text-decoration: none">
-        <el-text :line-clamp="1" size="large"><h1>PMail</h1></el-text>
+  <div class="h-12 bg-black flex items-center px-4">
+    <div class="flex-grow">
+      <router-link to="/" class="no-underline">
+        <h1 class="text-2xl font-bold text-white">PMail</h1>
       </router-link>
     </div>
-    <div id="settings" @click="settings" v-if="isLogin">
-      <el-icon style="font-size: 25px;">
-        <TbSettings style="color:#FFFFFF"/>
-      </el-icon>
+    <div v-if="isLogin" @click="settings" class="cursor-pointer">
+      <span class="iconify text-white text-2xl" data-icon="mdi:cog"></span>
     </div>
-    <el-drawer v-model="openSettings" size="80%" :title="lang.settings">
-      <el-tabs tab-position="left">
-        <el-tab-pane :label="lang.security">
-          <SecuritySettings/>
-        </el-tab-pane>
+  </div>
 
-        <el-tab-pane :label="lang.group_settings">
-          <GroupSettings/>
-        </el-tab-pane>
+  <!-- Settings Drawer -->
+  <div v-if="openSettings" class="fixed inset-0 z-50 overflow-hidden">
+    <div class="absolute inset-0 bg-black bg-opacity-50" @click="openSettings = false"></div>
+    <div class="absolute right-0 top-0 h-full w-4/5 bg-white shadow-xl flex">
+      <!-- Tabs Sidebar -->
+      <div class="w-48 bg-gray-100 border-r">
+        <div class="p-4 border-b">
+          <h2 class="text-lg font-bold">{{ lang.settings }}</h2>
+        </div>
+        <nav class="flex flex-col">
+          <button 
+            @click="activeTab = 'security'"
+            :class="['text-left px-4 py-3 hover:bg-gray-200 transition', activeTab === 'security' ? 'bg-white border-l-4 border-blue-500' : '']"
+          >
+            {{ lang.security }}
+          </button>
+          <button 
+            @click="activeTab = 'group'"
+            :class="['text-left px-4 py-3 hover:bg-gray-200 transition', activeTab === 'group' ? 'bg-white border-l-4 border-blue-500' : '']"
+          >
+            {{ lang.group_settings }}
+          </button>
+          <button 
+            @click="activeTab = 'rule'"
+            :class="['text-left px-4 py-3 hover:bg-gray-200 transition', activeTab === 'rule' ? 'bg-white border-l-4 border-blue-500' : '']"
+          >
+            {{ lang.rule_setting }}
+          </button>
+          <button 
+            v-if="userInfos.is_admin"
+            @click="activeTab = 'user'"
+            :class="['text-left px-4 py-3 hover:bg-gray-200 transition', activeTab === 'user' ? 'bg-white border-l-4 border-blue-500' : '']"
+          >
+            {{ lang.user_management }}
+          </button>
+          <button 
+            @click="activeTab = 'plugin'"
+            :class="['text-left px-4 py-3 hover:bg-gray-200 transition', activeTab === 'plugin' ? 'bg-white border-l-4 border-blue-500' : '']"
+          >
+            {{ lang.plugin_settings }}
+          </button>
+        </nav>
+      </div>
 
-        <el-tab-pane :label="lang.rule_setting">
-          <RuleSettings/>
-        </el-tab-pane>
-
-        <el-tab-pane v-if="userInfos.is_admin" :label="lang.user_management">
-          <UserManagement/>
-        </el-tab-pane>
-
-        <el-tab-pane :label="lang.plugin_settings">
-          <PluginSettings/>
-        </el-tab-pane>
-
-      </el-tabs>
-    </el-drawer>
-
+      <!-- Tab Content -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <button @click="openSettings = false" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800">
+          <span class="iconify text-2xl" data-icon="mdi:close"></span>
+        </button>
+        
+        <SecuritySettings v-if="activeTab === 'security'" />
+        <GroupSettings v-if="activeTab === 'group'" />
+        <RuleSettings v-if="activeTab === 'rule'" />
+        <UserManagement v-if="activeTab === 'user'" />
+        <PluginSettings v-if="activeTab === 'plugin'" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import {TbSettings} from "vue-icons-plus/tb";
 import {ref} from 'vue'
 import SecuritySettings from '@/components/SecuritySettings.vue'
 import lang from '../i18n/i18n';
@@ -53,8 +84,9 @@ const globalStatus = useGlobalStatusStore();
 const isLogin = globalStatus.isLogin;
 const userInfos = globalStatus.userInfos;
 
-
 const openSettings = ref(false)
+const activeTab = ref('security')
+
 const settings = function () {
   if (Object.keys(userInfos).length === 0) {
     globalStatus.init(()=>{
@@ -64,46 +96,8 @@ const settings = function () {
   } else {
     openSettings.value = true;
   }
-
-
 }
-
 </script>
 
-
 <style scoped>
-
-#header_main {
-  height: 50px;
-  background-color: #000;
-  display: flex;
-  padding: 0;
-}
-
-#logo {
-  height: 3rem;
-  line-height: 3rem;
-  font-size: 2.3rem;
-  flex-grow: 1;
-  width: 200px;
-  color: #FFF;
-  text-align: left;
-}
-
-#logo h1 {
-  padding-left: 20px;
-  color: white;
-}
-
-#search {
-  height: 3rem;
-  width: 100%;
-}
-
-#settings {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-right: 20px;
-}
 </style>
