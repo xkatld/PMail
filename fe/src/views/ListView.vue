@@ -1,55 +1,51 @@
 <template>
-  <div class="h-full flex flex-col bg-gray-50">
+  <div class="h-full flex flex-col bg-white">
     <!-- 顶部操作栏 -->
-    <div class="bg-white border-b border-gray-200 shadow-sm">
-      <div class="px-6 py-4 flex items-center justify-between">
+    <div class="bg-white border-b border-gray-200">
+      <div class="px-6 py-3 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-800 flex items-center space-x-2">
+          <Icon icon="solar:inbox-line-linear" class="text-primary-500 text-xl" />
+          <span>{{ groupStore.name }}</span>
+        </h2>
         <RouterLink 
           to="/editer" 
-          class="inline-flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 no-underline"
+          class="inline-flex items-center space-x-1.5 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-md transition-colors duration-200 no-underline"
         >
-          <Icon icon="solar:add-circle-bold" class="text-xl" />
+          <Icon icon="solar:add-circle-linear" class="text-base" />
           <span>{{ lang.compose }}</span>
         </RouterLink>
       </div>
     </div>
 
-    <!-- 标题区 -->
-    <div class="px-6 py-5 bg-white border-b border-gray-200">
-      <h2 class="text-2xl font-bold text-gray-800 flex items-center space-x-3">
-        <Icon icon="solar:inbox-line-bold-duotone" class="text-primary-500 text-3xl" />
-        <span>{{ groupStore.name }}</span>
-      </h2>
-    </div>
-
     <!-- 批量操作栏 -->
-    <div class="px-6 py-3 bg-white border-b border-gray-200 flex items-center space-x-3">
+    <div class="px-6 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center space-x-2">
       <button 
         @click="del" 
-        class="inline-flex items-center space-x-2 px-4 py-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-300 rounded-lg transition-all duration-200 font-medium"
+        class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-md transition-colors duration-200"
       >
-        <Icon icon="solar:trash-bin-trash-bold" class="text-lg" />
+        <Icon icon="solar:trash-bin-trash-linear" class="text-base" />
         <span>{{ lang.del_btn }}</span>
       </button>
 
       <button 
         @click="markRead" 
-        class="inline-flex items-center space-x-2 px-4 py-2 bg-white hover:bg-green-50 text-green-600 border border-green-200 hover:border-green-300 rounded-lg transition-all duration-200 font-medium"
+        class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-md transition-colors duration-200"
       >
-        <Icon icon="solar:check-read-bold" class="text-lg" />
+        <Icon icon="solar:check-read-linear" class="text-base" />
         <span>{{ lang.read_btn }}</span>
       </button>
 
       <el-dropdown>
-        <button class="inline-flex items-center space-x-2 px-4 py-2 bg-white hover:bg-blue-50 text-blue-600 border border-blue-200 hover:border-blue-300 rounded-lg transition-all duration-200 font-medium">
-          <Icon icon="solar:folder-with-files-bold" class="text-lg" />
+        <button class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-md transition-colors duration-200">
+          <Icon icon="solar:folder-linear" class="text-base" />
           <span>{{ lang.move_btn }}</span>
-          <Icon icon="solar:alt-arrow-down-linear" class="text-sm" />
+          <Icon icon="solar:alt-arrow-down-linear" class="text-xs" />
         </button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item @click="move(group.id,group.name)" v-for="group in groupList" :key="group.id">
               <div class="flex items-center space-x-2">
-                <Icon icon="solar:folder-bold-duotone" class="text-primary-500" />
+                <Icon icon="solar:folder-linear" class="text-primary-500" />
                 <span>{{ group.name }}</span>
               </div>
             </el-dropdown-item>
@@ -58,7 +54,7 @@
       </el-dropdown>
     </div>
     <!-- 邮件列表 -->
-    <div class="flex-1 overflow-auto px-6 py-4">
+    <div class="flex-1 overflow-auto">
       <el-table 
         ref="taskTableDataRef" 
         :data="data" 
@@ -69,30 +65,28 @@
         class="modern-table w-full"
         style="width: 100%"
       >
-        <el-table-column type="selection" width="50"/>
-        <el-table-column prop="is_read" label="" width="80">
+        <el-table-column type="selection" width="45"/>
+        <el-table-column prop="is_read" label="" width="70" align="center">
           <template #default="scope">
-            <div class="flex items-center space-x-2">
-              <span v-if="!scope.row.is_read" class="inline-flex items-center px-2 py-1 bg-primary-100 text-primary-700 text-xs font-semibold rounded-full">
-                {{ lang.new }}
-              </span>
+            <div class="flex items-center justify-center space-x-1">
+              <span v-if="!scope.row.is_read" class="w-2 h-2 bg-primary-500 rounded-full"></span>
               <el-tooltip v-if="scope.row.dangerous" effect="dark" :content="lang.dangerous" placement="top">
-                <Icon icon="solar:danger-triangle-bold" class="text-red-500 text-xl" />
+                <Icon icon="solar:danger-triangle-linear" class="text-red-500 text-base" />
               </el-tooltip>
               <el-tooltip v-if="scope.row.error !== ''" effect="dark" :content="scope.row.error" placement="top">
-                <Icon icon="solar:danger-circle-bold" class="text-red-500 text-xl" />
+                <Icon icon="solar:danger-circle-linear" class="text-red-500 text-base" />
               </el-tooltip>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="title" :label="lang.sender" width="200">
+        <el-table-column prop="title" :label="lang.sender" width="180">
           <template #default="scope">
             <el-tooltip class="box-item" effect="dark" :content="scope.row.sender.EmailAddress" placement="top">
               <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                <div class="w-7 h-7 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">
                   {{ (scope.row.sender.Name || scope.row.sender.EmailAddress)[0].toUpperCase() }}
                 </div>
-                <span class="font-medium text-gray-700 truncate">
+                <span class="text-sm text-gray-700 truncate">
                   {{ scope.row.sender.Name !== '' ? scope.row.sender.Name : scope.row.sender.EmailAddress }}
                 </span>
               </div>
@@ -100,12 +94,12 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="title" :label="lang.to" width="200">
+        <el-table-column prop="title" :label="lang.to" width="180">
           <template #default="scope">
             <div class="flex flex-wrap gap-1">
               <el-tooltip v-for="toInfo in scope.row.to" :key="toInfo" class="box-item" effect="dark"
                           :content="toInfo.EmailAddress" placement="top">
-                <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md">
+                <span class="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
                   {{ toInfo.Name !== '' ? toInfo.Name : toInfo.EmailAddress }}
                 </span>
               </el-tooltip>
@@ -115,36 +109,31 @@
 
         <el-table-column prop="desc" :label="lang.title" min-width="300">
           <template #default="scope">
-            <div class="space-y-1">
-              <div :class="['text-sm', scope.row.is_read ? 'text-gray-700' : 'text-gray-900 font-semibold']">
+            <div>
+              <div :class="['text-sm', scope.row.is_read ? 'text-gray-600' : 'text-gray-900 font-medium']">
                 {{ scope.row.title }}
               </div>
-              <div class="text-xs text-gray-500 truncate">{{ scope.row.desc }}</div>
+              <div class="text-xs text-gray-400 truncate mt-0.5">{{ scope.row.desc }}</div>
             </div>
           </template>
         </el-table-column>
         
-        <el-table-column prop="datetime" :label="lang.date" width="180">
+        <el-table-column prop="datetime" :label="lang.date" width="150" align="right">
           <template #default="scope">
-            <div class="flex items-center space-x-2 text-gray-600">
-              <Icon icon="solar:calendar-mark-linear" class="text-gray-400" />
-              <span :class="scope.row.is_read ? 'font-normal' : 'font-semibold'">
-                {{ scope.row.datetime }}
-              </span>
-            </div>
+            <span class="text-sm text-gray-500">{{ scope.row.datetime }}</span>
           </template>
         </el-table-column>
       </el-table>
     </div>
     
     <!-- 分页 -->
-    <div class="px-6 py-4 bg-white border-t border-gray-200 flex justify-center">
+    <div class="px-6 py-3 bg-white border-t border-gray-200 flex justify-center">
       <el-pagination 
         background 
         layout="prev, pager, next" 
         :page-count="totalPage" 
         @current-change="pageChange"
-        class="modern-pagination"
+        :small="true"
       />
     </div>
   </div>
@@ -336,57 +325,29 @@ const pageChange = function (p) {
 
 
 <style scoped>
-/* 现代化表格样式 */
-.modern-table :deep(.el-table__header-wrapper) {
-  background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
-}
-
+/* 表格样式 */
 .modern-table :deep(.el-table__header th) {
-  background-color: transparent !important;
-  color: #374151;
-  font-weight: 600;
+  background-color: #f9fafb !important;
+  color: #6b7280;
+  font-weight: 500;
   font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  padding: 12px 8px;
 }
 
 .modern-table :deep(.el-table__row) {
-  transition: all 0.2s ease;
-  background-color: white;
+  transition: background-color 0.15s ease;
 }
 
 .modern-table :deep(.el-table__row:hover) {
-  background-color: #f0f9ff !important;
-  transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background-color: #f9fafb !important;
 }
 
 .modern-table :deep(.el-table__body td) {
   border-bottom: 1px solid #f3f4f6;
-  padding: 16px 12px;
+  padding: 12px 8px;
 }
 
 .modern-table :deep(.el-table::before) {
   display: none;
-}
-
-/* 分页样式 */
-.modern-pagination :deep(.el-pager li) {
-  transition: all 0.2s ease;
-}
-
-.modern-pagination :deep(.el-pager li.is-active) {
-  background: linear-gradient(to right, #0ea5e9, #0284c7);
-  color: white;
-}
-
-.modern-pagination :deep(.btn-prev),
-.modern-pagination :deep(.btn-next) {
-  transition: all 0.2s ease;
-}
-
-.modern-pagination :deep(.btn-prev:hover),
-.modern-pagination :deep(.btn-next:hover) {
-  color: #0ea5e9;
 }
 </style>

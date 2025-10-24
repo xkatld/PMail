@@ -1,30 +1,28 @@
 <template>
-  <header class="h-16 bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 shadow-lg">
+  <header class="h-14 bg-white border-b border-gray-200 shadow-sm">
     <div class="h-full flex items-center justify-between px-6">
       <!-- Logo 区域 -->
-      <router-link to="/" class="flex items-center space-x-3 group no-underline">
-        <div class="bg-white/10 p-2 rounded-lg group-hover:bg-white/20 transition-all duration-300">
-          <Icon icon="mdi:email-fast" class="text-white text-3xl" />
-        </div>
-        <h1 class="text-2xl font-bold text-white tracking-wide group-hover:scale-105 transition-transform duration-300">
+      <router-link to="/" class="flex items-center space-x-2 group no-underline">
+        <Icon icon="mdi:email-fast" class="text-primary-500 text-2xl" />
+        <h1 class="text-xl font-semibold text-gray-800">
           PMail
         </h1>
       </router-link>
 
       <!-- 右侧操作区 -->
-      <div class="flex items-center space-x-4" v-if="isLogin">
+      <div class="flex items-center" v-if="isLogin">
         <button 
           @click="settings" 
-          class="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-300 group"
+          class="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-md transition-colors duration-200"
         >
-          <Icon icon="solar:settings-bold-duotone" class="text-white text-xl group-hover:rotate-90 transition-transform duration-500" />
-          <span class="text-white font-medium hidden md:inline">设置</span>
+          <Icon icon="solar:settings-linear" class="text-xl" />
+          <span class="text-sm font-medium hidden md:inline">设置</span>
         </button>
       </div>
     </div>
 
     <!-- 设置抽屉 -->
-    <el-drawer v-model="openSettings" size="80%" :title="lang.settings" class="modern-drawer">
+    <el-drawer v-model="openSettings" size="80%" :title="lang.settings">
       <el-tabs tab-position="left" class="h-full">
         <el-tab-pane :label="lang.security">
           <SecuritySettings/>
@@ -80,17 +78,4 @@ const settings = function () {
 
 
 <style scoped>
-.modern-drawer :deep(.el-drawer__header) {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.modern-drawer :deep(.el-tabs__item) {
-  transition: all 0.3s ease;
-}
-
-.modern-drawer :deep(.el-tabs__item:hover) {
-  background-color: #f3f4f6;
-}
 </style>

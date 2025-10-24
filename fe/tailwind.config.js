@@ -9,15 +9,15 @@ export default {
       colors: {
         primary: {
           50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          100: '#e8f4ff',
+          200: '#d1e9ff',
+          300: '#a6d4ff',
+          400: '#7ab8ff',
+          500: '#4a9eff',
+          600: '#2b7de9',
+          700: '#1e5fc7',
+          800: '#1648a0',
+          900: '#0f3478',
         },
         secondary: {
           50: '#f8fafc',
@@ -32,15 +32,21 @@ export default {
           900: '#0f172a',
         }
       },
+      borderRadius: {
+        'sm': '0.25rem',    // 4px - 小圆角
+        'DEFAULT': '0.375rem', // 6px - 默认
+        'md': '0.5rem',     // 8px - 中等
+        'lg': '0.625rem',   // 10px - 大
+        'xl': '0.75rem',    // 12px - 超大
+      },
       boxShadow: {
-        'soft': '0 2px 15px rgba(0, 0, 0, 0.08)',
-        'medium': '0 4px 20px rgba(0, 0, 0, 0.12)',
-        'large': '0 10px 40px rgba(0, 0, 0, 0.15)',
+        'soft': '0 1px 3px rgba(0, 0, 0, 0.05)',
+        'medium': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'large': '0 4px 16px rgba(0, 0, 0, 0.1)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-        'slide-in': 'slideIn 0.3s ease-out',
-        'bounce-subtle': 'bounceSubtle 0.5s ease-in-out',
+        'fade-in': 'fadeIn 0.2s ease-in-out',
+        'slide-in': 'slideIn 0.2s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -51,15 +57,10 @@ export default {
           '0%': { transform: 'translateX(-10px)', opacity: '0' },
           '100%': { transform: 'translateX(0)', opacity: '1' },
         },
-        bounceSubtle: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-5px)' },
-        },
       },
     },
   },
   plugins: [],
-  // 确保 Tailwind 不与 Element Plus 冲突
   corePlugins: {
     preflight: true,
   },
