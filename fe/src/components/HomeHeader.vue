@@ -1,17 +1,31 @@
 <template>
-  <div id="header_main">
-    <div id="logo">
-      <router-link to="/" style="text-decoration: none">
-        <el-text :line-clamp="1" size="large"><h1>PMail</h1></el-text>
+  <header class="h-16 bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 shadow-lg">
+    <div class="h-full flex items-center justify-between px-6">
+      <!-- Logo 区域 -->
+      <router-link to="/" class="flex items-center space-x-3 group no-underline">
+        <div class="bg-white/10 p-2 rounded-lg group-hover:bg-white/20 transition-all duration-300">
+          <Icon icon="mdi:email-fast" class="text-white text-3xl" />
+        </div>
+        <h1 class="text-2xl font-bold text-white tracking-wide group-hover:scale-105 transition-transform duration-300">
+          PMail
+        </h1>
       </router-link>
+
+      <!-- 右侧操作区 -->
+      <div class="flex items-center space-x-4" v-if="isLogin">
+        <button 
+          @click="settings" 
+          class="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-300 group"
+        >
+          <Icon icon="solar:settings-bold-duotone" class="text-white text-xl group-hover:rotate-90 transition-transform duration-500" />
+          <span class="text-white font-medium hidden md:inline">设置</span>
+        </button>
+      </div>
     </div>
-    <div id="settings" @click="settings" v-if="isLogin">
-      <el-icon style="font-size: 25px;">
-        <TbSettings style="color:#FFFFFF"/>
-      </el-icon>
-    </div>
-    <el-drawer v-model="openSettings" size="80%" :title="lang.settings">
-      <el-tabs tab-position="left">
+
+    <!-- 设置抽屉 -->
+    <el-drawer v-model="openSettings" size="80%" :title="lang.settings" class="modern-drawer">
+      <el-tabs tab-position="left" class="h-full">
         <el-tab-pane :label="lang.security">
           <SecuritySettings/>
         </el-tab-pane>
@@ -31,15 +45,13 @@
         <el-tab-pane :label="lang.plugin_settings">
           <PluginSettings/>
         </el-tab-pane>
-
       </el-tabs>
     </el-drawer>
-
-  </div>
+  </header>
 </template>
 
 <script setup>
-import {TbSettings} from "vue-icons-plus/tb";
+import { Icon } from '@iconify/vue';
 import {ref} from 'vue'
 import SecuritySettings from '@/components/SecuritySettings.vue'
 import lang from '../i18n/i18n';
@@ -53,7 +65,6 @@ const globalStatus = useGlobalStatusStore();
 const isLogin = globalStatus.isLogin;
 const userInfos = globalStatus.userInfos;
 
-
 const openSettings = ref(false)
 const settings = function () {
   if (Object.keys(userInfos).length === 0) {
@@ -64,46 +75,22 @@ const settings = function () {
   } else {
     openSettings.value = true;
   }
-
-
 }
-
 </script>
 
 
 <style scoped>
-
-#header_main {
-  height: 50px;
-  background-color: #000;
-  display: flex;
-  padding: 0;
+.modern-drawer :deep(.el-drawer__header) {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e5e7eb;
 }
 
-#logo {
-  height: 3rem;
-  line-height: 3rem;
-  font-size: 2.3rem;
-  flex-grow: 1;
-  width: 200px;
-  color: #FFF;
-  text-align: left;
+.modern-drawer :deep(.el-tabs__item) {
+  transition: all 0.3s ease;
 }
 
-#logo h1 {
-  padding-left: 20px;
-  color: white;
-}
-
-#search {
-  height: 3rem;
-  width: 100%;
-}
-
-#settings {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-right: 20px;
+.modern-drawer :deep(.el-tabs__item:hover) {
+  background-color: #f3f4f6;
 }
 </style>
